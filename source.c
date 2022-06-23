@@ -84,15 +84,24 @@ OWN *lowl_insert_right(LOWL* list, float val)
 	if(list->beg == NULL && list->cur == NULL)
     {
         list->beg = l;
-        list->cur = l;
+        list->beg->next = NULL;
+        list->cur = list->beg;
 		
 		return list->cur;
 	}
+
+    if (list->cur->next!=NULL)
+    {
+	    l->next = list->cur->next;
+        list->cur->next=l; 
+    }
+    else
+    {
+        list->cur->next = l;
+        list->cur = list->cur->next;
+    }
 	
-	l->next = list->cur->next;
-	list->cur->next = l;
-	
-	return l;
+	return list->cur;
 }
 
 LOWL *lowl_create_random(unsigned int size)
@@ -102,10 +111,10 @@ LOWL *lowl_create_random(unsigned int size)
 	LOWL *l;
 
 	l = lowl_create_empty();
-	
+
 	for(i = 0; i < size; i++)
     {
-        val = rand();
+        val = rand()%100;
 		l->cur = lowl_insert_right(l,val);
 	}
 	
@@ -125,16 +134,16 @@ char lowl_delete(LOWL* list)
 	
 	if(l->next != NULL)
     {
-		free(list->cur);
-		list->cur = l->next;
+        l = list->cur->next;
+        lowl_cur_step_left(list);
+		free(list->cur->next);
+		list->cur->next = l;
 		
 		return LOWL_OK;
 	}
-	
-	free(list->cur);
-	
-	lowl_cur_step_left(list);
-	
+
+	lowl_cur_step_left(list);	
+	list->cur->next=NULL;
 	free(l);
 	
 	if(l != NULL)
@@ -159,14 +168,13 @@ void lowl_print(LOWL *list)
 {
 	OWN *c;
 
-    if(list->cur==NULL)
+    if(list->cur==NULL || list->beg==NULL)
     {
         printf("NULL\n");
     }
     else
     {
-    	c = list->cur;
-	    list->cur = list->beg;
+    	c = list->beg;
 	
 	    do
         {
@@ -175,16 +183,10 @@ void lowl_print(LOWL *list)
 			    printf("-> ");            
             }
 		
-		    printf("%f\n", list->cur->data);
-		    lowl_cur_step_right(list);
+		    printf("%f\n", c->data);
+		    c = c->next;
 	    }
-        while(list->cur->next != NULL);
-
-        if(c == list->cur && list->cur!=list->beg)
-        {
-		    printf("-> ");
-    	    printf("%f\n", list->cur->data);           
-        }
+        while(c != NULL);
     }
 }
 
