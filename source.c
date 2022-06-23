@@ -98,8 +98,48 @@ OWN *lowl_insert_right(LOWL* list, float val)
     else
     {
         list->cur->next = l;
-        list->cur = list->cur->next;
+        list->cur = l;
     }
+	
+	return list->cur;
+}
+
+OWN *lowl_insert_left(LOWL* list, float val)
+{	
+	OWN *l;
+	
+	if((l = malloc(sizeof(OWN))) == NULL)
+    {
+		return NULL;        
+    }
+	
+	l->data = val;
+	
+	if(list->beg == NULL && list->cur == NULL)
+    {
+        lowl_insert_right(list,val);
+		
+		return list->cur;
+	}
+
+    if(list->beg==list->cur)
+    {
+        l->next = list->beg;
+        list->beg=l;
+        list->cur=l;
+
+        return list->cur;
+    }
+
+    l->next=list->cur;
+    list->cur=list->beg;
+    while(l->next!=list->cur->next)
+    {
+        list->cur=list->cur->next;
+    }
+    
+    list->cur->next=l;
+    list->cur=l;
 	
 	return list->cur;
 }
@@ -115,6 +155,7 @@ LOWL *lowl_create_random(unsigned int size)
 	for(i = 0; i < size; i++)
     {
         val = rand()%100;
+        //l->cur = lowl_insert_left(l,val);
 		l->cur = lowl_insert_right(l,val);
 	}
 	
